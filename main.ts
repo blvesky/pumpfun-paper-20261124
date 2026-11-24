@@ -1,14 +1,14 @@
-// Pump.fun Paper Sprint — broad launch sniper (agent-fun/replay/v2).
-// The grader runs `node /bot/main.ts`; the strategy lives in strategy.ts
-// and the wire shim in vendor/shim.ts (written for this entry, no deps).
-// One buy per coin, fast take-profit / stop-loss / trailing exits, creator
-// filter on entry. See strategy.ts and STRATEGY.md for the full reasoning.
+// main.ts — entrypoint for the Pump.fun paper sprint bot.
+//
+// The harness speaks agent-fun/replay/v2 on stdin/stdout; the vendored
+// official SDK owns that wire. This file only builds the strategy and
+// hands it the batches, one reply per batch, in slot order.
 
-import { runBot } from './vendor/shim.ts';
-import { createStrategy, DEFAULT_PARAMS } from './strategy.ts';
+import { runBot } from "./vendor/makefun-bot.ts";
+import { PaperSniper } from "./strategy.ts";
 
-const strategy = createStrategy(DEFAULT_PARAMS);
+const sniper = new PaperSniper();
 
 await runBot({
-  onBatch: (state, batch) => strategy.onBatch(state, batch),
+  onBatch: (state, batch) => sniper.decide(state, batch),
 });
